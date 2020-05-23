@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 // used to create fake backend
@@ -14,19 +14,30 @@ import { LoginComponent } from './login';
 import { RegisterComponent } from './register';
 import { AlertComponent } from './_components';
 
+
+import {NgbPaginationModule, NgbAlertModule, NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import { DxChartModule, DxButtonModule } from 'devextreme-angular';
+import { ChatsComponent } from './chats/chats.component';
+
+
 @NgModule({
     imports: [
         BrowserModule,
         ReactiveFormsModule,
         HttpClientModule,
-        appRoutingModule
+        appRoutingModule,
+        NgbPaginationModule, NgbAlertModule,FormsModule,
+        NgbModule,
+        DxChartModule,
+        DxButtonModule
     ],
     declarations: [
         AppComponent,
         HomeComponent,
         LoginComponent,
         RegisterComponent,
-        AlertComponent
+        AlertComponent,
+        ChatsComponent
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

@@ -1,9 +1,109 @@
-<h1>Hi {{currentUser.firstName}}!</h1>
-<p>You're logged in with Angular 8!!</p>
-<h3>All registered users:</h3>
-<ul>
-    <li *ngFor="let user of users">
-        {{user.username}} ({{user.firstName}} {{user.lastName}})
-        - <a (click)="deleteUser(user.id)" class="text-danger">Delete</a>
-    </li>
-</ul>
+
+    <form class="form-signin" [formGroup]="entryForm" >
+        <div class="text-center mb-4 row custom-row custom-padding">
+            <!-- Default unchecked -->
+            <div class="custom-control custom-radio">
+                <input type="radio" checked (click)="onClick()" class="custom-control-input" id="defaultUnchecked"
+                    name="defaultExampleRadios" mdbInput>
+                <label class="custom-control-label" for="defaultUnchecked">Start Now</label>
+            </div>
+
+            <!-- Default checked -->
+            <div class="custom-control custom-radio custom-padding">
+                <input type="radio" (click)="onClick(true)" class="custom-control-input" id="defaultChecked"
+                    name="defaultExampleRadios" mdbInput>
+                <label class="custom-control-label" for="defaultChecked">Schedule</label>
+            </div>
+        </div>
+        <div class="form-label-group row custom-row custom-padding" *ngIf="entryForm.value.isScheduled">
+            
+            <div class="form-group">
+                <label for="password">Date</label>
+                <div class="input-group pt-8">
+                    <input class="form-control" placeholder="yyyy-mm-dd"
+                           name="dp" formControlName="date" ngbDatepicker #d="ngbDatepicker">
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-secondary calendar" (click)="d.toggle()" type="button"></button>
+                    </div>
+                  </div>
+            </div>
+
+                <div class="form-group">
+                <label for="time">Schedule Time</label>
+                    <ngb-timepicker formControlName="time" ></ngb-timepicker>
+                </div>
+        </div>
+        <div class="form-label-group justify-content-center custom-padding row custom-row">
+            <div class="form-group">
+                <label for="password">Description</label>
+                <input type="text" formControlName="description" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.description.errors }" placeholder="Enter Task Description"/>
+                <div *ngIf="submitted && f.description.errors" class="invalid-feedback">
+                    <div *ngIf="f.description.errors.required">Description is required</div>
+                </div>
+            </div>
+            <!-- <div class="col">
+                <label for="subdomain">Description</label>
+                <input type="text"  formControlName="description" placeholder="Enter the description"  />
+            </div> -->
+            <div class="col justify-content-end">
+                <button (click)="onClickSubmit()" class="btn btn-sm btn-primary" type="submit"> {{entryForm.value.isScheduled ? 'Schedule' : 'Start'}}</button>
+            </div>
+        </div>
+      </form>
+<!-- </div> -->
+
+
+<table class="table table-striped table-dark" *ngIf="userTimeFrames?.length">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Description</th>
+        <th scope="col">Started At</th>
+        <th scope="col">Completed At</th>
+        <th scope="col">Total Time</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+
+   <ng-container *ngFor="let frame of userTimeFrames;let i =index" >
+      <tr (click)="frame.expanded = (frame.expanded ? false : true)">
+        <td scope="row">{{i+1}}</td>
+        <td>{{frame?.description}}</td>
+        <td>{{frame?.timings[0]?.startedAt | date: 'short'}}</td>
+        <td>{{frame?.completedAt |  date: 'short'}}</td>
+        <td>{{frame?.timeTaken ? frame?.timeTaken : getTimeDiff(frame?.timings)}}</td>
+        <td>
+        <ng-container *ngIf="frame.status !== 'Completed'; else not_completed">
+            <button *ngIf="frame.status === 'Schedule' || frame.status === 'Stopped'" (click)="onClickStarted(frame, i)" class="btn btn-sm btn-primary" type="button">Start</button>
+            <button *ngIf="frame.status !== 'Schedule' && frame.status !== 'Stopped'" (click)="onClickStop(frame, i)" class="btn btn-sm btn-danger" type="button">Stop</button>
+            <button *ngIf="frame.status !== 'Schedule' || frame.status === 'Stopped'" (click)="onClickComplete(frame, i)" class="btn btn-sm btn-success pl-2" type="button">Complete</button>
+        </ng-container>
+        <ng-template #not_completed>
+            <button  class="btn btn-sm btn-dark" type="button">Completed</button>
+        </ng-template>
+        </td>
+      </tr>
+      <ng-container *ngIf="frame.expanded && frame.timings?.length">
+        <tr class="text-center justify-content-center">
+            <th scope="row"></th>
+            <th scope="row">Started At</th>
+            <th >Completed At</th>
+            <th >Tme Took</th>
+        </tr>
+        <tr class="text-center justify-content-center" *ngFor="let time of frame.timings">
+           <td></td>
+          <td scope="row"> {{time.startedAt  | date: 'short'}} </td>
+          <td > {{time.stoppedAt  | date: 'short'}} </td>
+          <td > {{ getTimeDiff([time])}} </td>
+        </tr>
+      </ng-container>
+    </ng-container>
+    </tbody>
+  </table>
+
+<app-chats *ngIf="userTimeFrames?.length" [isChanged]="isChanged"></app-chats>
+
+
+
+  

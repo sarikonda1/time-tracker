@@ -1,0 +1,14 @@
+<button *ngIf="!isFirstLevel" (click)="onButtonClick()">
+  Back
+</button>
+<dx-chart id="chart"
+          [class]="isFirstLevel?'pointer-on-bars':''"
+          [dataSource]="dataSource"
+          (onPointClick)="onPointClick($event)"
+          title="Timing Hours Based on Day"
+          [customizePoint]="customizePoint">
+    <dxi-series type="bar"></dxi-series>
+    <dxo-legend [visible]="false"></dxo-legend>
+    <dxi-value-axis [showZero]="false"></dxi-value-axis>
+</dx-chart>
+
